@@ -1,0 +1,23 @@
+# Rust / Anchor build artifacts
+target/
+**/*.rs.bk
+.anchor/
+test-ledger/
+
+# Node
+node_modules/
+.yarn/
+dist/
+build/
+
+# Solana / secrets — NEVER commit keypairs or env files
+*-keypair.json
+id.json
+.env
+.env.*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
