@@ -8,8 +8,11 @@ skip-lint = false
 [programs.localnet]
 anchor_starter = "5QHECrupbXq7KZdpoEo14iE7mJ5UFek4m38Q2Q38NpXU"
 
+[programs.devnet]
+anchor_starter = "5QHECrupbXq7KZdpoEo14iE7mJ5UFek4m38Q2Q38NpXU"
+
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
