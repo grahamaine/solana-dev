@@ -8,7 +8,7 @@ Solana development workspace — Week 2 Exercise 1 (environment setup).
 |------|---------|
 | Rust | 1.96.0 |
 | Node.js | v24.15.0 |
-| Solana CLI | 4.0.1 (Agave) |
+| Solana CLI | 3.1.10 (Agave) |
 | Anchor | 1.0.2 |
 
 Everything runs inside **WSL2 / Ubuntu 24.04** (run dev commands from the Ubuntu terminal, not Windows PowerShell).
