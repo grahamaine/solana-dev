@@ -1,0 +1,10 @@
+node_modules/
+# Never commit private keys
+recipient.json
+*-keypair.json
+# Local CLI scratch output
+*.log
+mint.json
+ata.json
+transfer.json
+mint-supply.json

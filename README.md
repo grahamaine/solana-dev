@@ -14,6 +14,17 @@ tested against LiteSVM (no validator needed: `cargo test`).
 Each exercise builds with `anchor build` and tests with `cargo test` from
 its own directory.
 
+## Week 3 exercises
+
+CLI-first this week: use the `spl-token` CLI to create/mint/inspect, then read
+the same state back in TypeScript (`@solana/web3.js` + `@solana/spl-token`).
+Runs against **devnet**. See [`week3-tokens/`](week3-tokens/).
+
+| Exercise | Covers |
+|----------|--------|
+| [`exercise3-spl-token/`](week3-tokens/exercise3-spl-token/) | **Your First Token**: SPL mint, token accounts, mint supply, transfer between two wallets, then a TS reader (`supply == sender + recipient`) |
+| [`exercise4-token2022/`](week3-tokens/exercise4-token2022/) | **Token-2022 extensions**: mint with **TransferFeeConfig** (observable 5% fee) + **Metadata**, then decode extension data straight off the mint account in TS |
+
 ## Toolchain
 
 | Tool | Version |
