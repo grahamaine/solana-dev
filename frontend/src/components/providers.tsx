@@ -1,6 +1,14 @@
 "use client";
 
+import { Buffer } from "buffer";
 import { useMemo } from "react";
+
+// Anchor's (de)serialization relies on the Node `Buffer` global, which the
+// browser doesn't provide. Polyfill it once on the client.
+if (typeof window !== "undefined") {
+  const w = window as unknown as { Buffer?: typeof Buffer };
+  if (!w.Buffer) w.Buffer = Buffer;
+}
 import {
   ConnectionProvider,
   WalletProvider,
