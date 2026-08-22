@@ -1,26 +1,160 @@
 @import "tailwindcss";
 
+/* ------------------------------------------------------------------ *
+ * Solana-neon design system — dark-first, gradient accents, soft glow *
+ * ------------------------------------------------------------------ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Base surfaces */
+  --background: #07060c;
+  --foreground: #ececf1;
+
+  /* Brand — Solana purple → green */
+  --brand-purple: #9945ff;
+  --brand-green: #14f195;
+  --brand-teal: #19fb9b;
+  --grad-brand: linear-gradient(120deg, #9945ff 0%, #7a5cff 40%, #14f195 100%);
+
+  /* Muted text scale */
+  --muted: #a5a3b5;
+  --muted-2: #6f6d82;
+
+  /* Card / surface tokens */
+  --surface: rgba(255, 255, 255, 0.026);
+  --surface-hover: rgba(255, 255, 255, 0.05);
+  --border: rgba(255, 255, 255, 0.09);
+  --border-strong: rgba(255, 255, 255, 0.16);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-brand-purple: var(--brand-purple);
+  --color-brand-green: var(--brand-green);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Dark-first: this dApp commits to a dark neon look regardless of system. */
+html {
+  color-scheme: dark;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  min-height: 100%;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Ambient aurora glow behind everything */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60rem 40rem at 12% -8%, rgba(153, 69, 255, 0.22), transparent 60%),
+    radial-gradient(52rem 38rem at 92% 0%, rgba(20, 241, 149, 0.14), transparent 55%),
+    radial-gradient(46rem 40rem at 50% 118%, rgba(122, 92, 255, 0.14), transparent 60%);
+}
+
+/* ------------------------------ Utilities ------------------------------ */
+
+.text-gradient {
+  background: var(--grad-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.border-gradient {
+  position: relative;
+}
+.border-gradient::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--grad-brand);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+.border-gradient:hover::before {
+  opacity: 1;
+}
+
+.glow-purple {
+  box-shadow: 0 0 0 1px rgba(153, 69, 255, 0.25), 0 12px 40px -12px rgba(153, 69, 255, 0.5);
+}
+.glow-green {
+  box-shadow: 0 0 0 1px rgba(20, 241, 149, 0.25), 0 12px 40px -12px rgba(20, 241, 149, 0.45);
+}
+
+/* ------------------------------ Animations ------------------------------ */
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-rise { animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0 rgba(20, 241, 149, 0.5); }
+  70%  { box-shadow: 0 0 0 8px rgba(20, 241, 149, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(20, 241, 149, 0); }
+}
+.animate-pulse-ring { animation: pulse-ring 1.6s ease-out infinite; }
+
+/* ------------------------------ Scrollbar ------------------------------ */
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(153, 69, 255, 0.5); background-clip: padding-box; }
+
+/* --------------------- Wallet-adapter button override --------------------- */
+
+.wallet-adapter-button {
+  height: 2.25rem !important;
+  padding: 0 0.95rem !important;
+  font-family: var(--font-geist-sans), sans-serif !important;
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  border-radius: 0.6rem !important;
+  background: linear-gradient(120deg, #9945ff, #7a5cff) !important;
+  color: #fff !important;
+  transition: filter 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+.wallet-adapter-button:not([disabled]):hover {
+  background: linear-gradient(120deg, #9945ff, #7a5cff) !important;
+  filter: brightness(1.12) !important;
+  box-shadow: 0 8px 26px -10px rgba(153, 69, 255, 0.8) !important;
+  transform: translateY(-1px);
+}
+.wallet-adapter-button-trigger { background: linear-gradient(120deg, #9945ff, #7a5cff) !important; }
+
+.wallet-adapter-modal-wrapper {
+  background: #0d0b16 !important;
+  border: 1px solid var(--border) !important;
+}
+.wallet-adapter-modal-button-close { background: rgba(255, 255, 255, 0.06) !important; }
+.wallet-adapter-dropdown-list {
+  background: #0d0b16 !important;
+  border: 1px solid var(--border) !important;
 }

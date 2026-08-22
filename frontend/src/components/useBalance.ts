@@ -12,8 +12,9 @@ export function useBalance() {
 
   useEffect(() => {
     if (!publicKey) {
-      setSol(null);
-      return;
+      // Defer so the reset isn't a synchronous setState in the effect body.
+      const id = setTimeout(() => setSol(null), 0);
+      return () => clearTimeout(id);
     }
     let active = true;
 

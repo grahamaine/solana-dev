@@ -60,9 +60,30 @@ export function useCounter() {
     }
   }, [program, counterPda]);
 
+  // Load the account whenever the program/PDA changes. The fetch runs inside
+  // an async closure (not synchronously in the effect body) and bails out via
+  // `active` if the wallet/connection changes before it resolves.
   useEffect(() => {
-    refresh();
-  }, [refresh]);
+    if (!program || !counterPda) return;
+    let active = true;
+    (async () => {
+      try {
+        const acct = await program.account.counter.fetch(counterPda);
+        if (active) {
+          setCount(Number(acct.count));
+          setExists(true);
+        }
+      } catch {
+        if (active) {
+          setCount(null);
+          setExists(false);
+        }
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [program, counterPda]);
 
   // Wrap each instruction call with shared loading/error/refresh handling.
   const run = useCallback(

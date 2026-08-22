@@ -1,8 +1,15 @@
 "use client";
 
-import Link from "next/link";
-import { Container, ProgramHeader, WalletGate, Card } from "@/components/ui";
-import { PROGRAM_IDS, explorerUrl } from "@/lib/constants";
+import {
+  Container,
+  ProgramHeader,
+  WalletGate,
+  Card,
+  Button,
+  AddressLink,
+  CounterIcon,
+} from "@/components/ui";
+import { PROGRAM_IDS } from "@/lib/constants";
 import { useCounter } from "@/components/useCounter";
 
 export default function CounterPage() {
@@ -12,6 +19,7 @@ export default function CounterPage() {
         title="Counter"
         programId={PROGRAM_IDS.counter.toBase58()}
         instructions={["initialize", "increment", "decrement", "reset"]}
+        icon={<CounterIcon />}
       />
       <WalletGate>
         <CounterPanel />
@@ -35,102 +43,81 @@ function CounterPanel() {
   } = useCounter();
 
   return (
-    <Card className="flex flex-col gap-6">
-      {/* Current value */}
-      <div>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">Your count</p>
-        <p className="mt-1 text-5xl font-semibold tabular-nums">
-          {exists ? count : "—"}
+    <div className="animate-rise flex flex-col gap-4">
+      {/* Value display */}
+      <Card className="relative overflow-hidden">
+        <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-brand-purple/10 blur-3xl" />
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+          Your count
+        </p>
+        <p className="mt-2 text-7xl font-semibold tabular-nums leading-none">
+          {exists ? (
+            <span className="text-gradient">{count}</span>
+          ) : (
+            <span className="text-zinc-700">—</span>
+          )}
         </p>
         {!exists && (
-          <p className="mt-2 text-sm text-zinc-500">
-            No counter yet for this wallet. Run <code>initialize</code> to
-            create one.
+          <p className="mt-3 text-sm text-zinc-500">
+            No counter yet for this wallet. Run{" "}
+            <code className="rounded bg-white/[.06] px-1 py-0.5 font-mono text-xs text-zinc-300">
+              initialize
+            </code>{" "}
+            to create one.
           </p>
         )}
-      </div>
+      </Card>
 
       {/* Actions */}
-      <div className="flex flex-wrap gap-2">
-        {!exists ? (
-          <Button onClick={initialize} disabled={loading}>
-            Initialize
-          </Button>
-        ) : (
-          <>
-            <Button onClick={increment} disabled={loading}>
-              Increment +1
+      <Card className="flex flex-col gap-5">
+        <div className="flex flex-wrap gap-2.5">
+          {!exists ? (
+            <Button onClick={initialize} loading={loading}>
+              Initialize counter
             </Button>
-            <Button onClick={decrement} disabled={loading} variant="ghost">
-              Decrement −1
-            </Button>
-            <Button onClick={reset} disabled={loading} variant="ghost">
-              Reset
-            </Button>
-          </>
+          ) : (
+            <>
+              <Button onClick={increment} disabled={loading}>
+                Increment +1
+              </Button>
+              <Button onClick={decrement} disabled={loading} variant="ghost">
+                Decrement −1
+              </Button>
+              <Button onClick={reset} disabled={loading} variant="danger">
+                Reset
+              </Button>
+            </>
+          )}
+        </div>
+
+        {/* Live status */}
+        {loading && (
+          <div className="flex items-center gap-2 rounded-lg border border-brand-purple/20 bg-brand-purple/[.06] px-3 py-2 text-sm text-purple-200">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-brand-purple" />
+            Sending transaction…
+          </div>
         )}
-      </div>
 
-      {loading && (
-        <p className="text-sm text-zinc-500">Sending transaction…</p>
-      )}
+        {error && (
+          <div className="rounded-lg border border-red-500/25 bg-red-500/[.07] px-3 py-2 text-sm text-red-300 break-words">
+            {error}
+          </div>
+        )}
 
-      {error && (
-        <p className="text-sm text-red-600 dark:text-red-400 break-words">
-          {error}
-        </p>
-      )}
+        {txSig && !loading && (
+          <div className="flex flex-wrap items-center gap-2 rounded-lg border border-brand-green/20 bg-brand-green/[.06] px-3 py-2 text-sm text-emerald-200">
+            <span className="h-2 w-2 rounded-full bg-brand-green" />
+            Confirmed —
+            <AddressLink value={txSig} kind="tx" />
+          </div>
+        )}
 
-      {txSig && (
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          Last tx:{" "}
-          <Link
-            href={explorerUrl(txSig, "tx")}
-            target="_blank"
-            className="font-mono text-xs underline decoration-dotted underline-offset-2"
-          >
-            {txSig.slice(0, 8)}…{txSig.slice(-8)}
-          </Link>
-        </p>
-      )}
-
-      {counterPda && (
-        <p className="text-xs text-zinc-500">
-          Counter PDA:{" "}
-          <Link
-            href={explorerUrl(counterPda.toBase58())}
-            target="_blank"
-            className="font-mono underline decoration-dotted underline-offset-2"
-          >
-            {counterPda.toBase58().slice(0, 6)}…
-            {counterPda.toBase58().slice(-6)}
-          </Link>
-        </p>
-      )}
-    </Card>
-  );
-}
-
-function Button({
-  children,
-  onClick,
-  disabled,
-  variant = "solid",
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  disabled?: boolean;
-  variant?: "solid" | "ghost";
-}) {
-  const base =
-    "rounded-lg px-4 py-2 text-sm font-medium transition disabled:opacity-40 disabled:cursor-not-allowed";
-  const styles =
-    variant === "solid"
-      ? "bg-zinc-900 text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
-      : "border border-black/[.12] hover:bg-black/[.04] dark:border-white/[.16] dark:hover:bg-white/[.06]";
-  return (
-    <button onClick={onClick} disabled={disabled} className={`${base} ${styles}`}>
-      {children}
-    </button>
+        {counterPda && (
+          <p className="flex flex-wrap items-center gap-1.5 border-t border-white/[.06] pt-3 text-xs text-zinc-500">
+            Counter PDA <AddressLink value={counterPda.toBase58()} />
+          </p>
+        )}
+      </Card>
+    </div>
   );
 }
