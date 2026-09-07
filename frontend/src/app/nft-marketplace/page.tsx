@@ -332,15 +332,16 @@ function ListingCard({
   const [newPrice, setNewPrice] = useState(lamportsToSol(listing.price).toString());
 
   return (
-    <Card className="flex flex-col gap-3">
-      <div className="flex items-start justify-between gap-3">
+    <Card className="border-gradient relative flex flex-col gap-3 overflow-hidden">
+      <div className="pointer-events-none absolute -right-14 -top-14 h-40 w-40 rounded-full bg-brand-purple/10 blur-3xl" />
+      <div className="relative flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs text-zinc-500">NFT mint</p>
           <AddressLink value={listing.nftMint.toBase58()} />
         </div>
         {isSeller && <Badge tone="muted">your listing</Badge>}
       </div>
-      <div className="flex items-baseline justify-between">
+      <div className="relative flex items-baseline justify-between">
         <span className="text-2xl font-semibold tabular-nums text-gradient">
           {lamportsToSol(listing.price).toFixed(3)} SOL
         </span>
@@ -409,8 +410,9 @@ function AuctionCard({
   const timeLeft = auction.endTime - nowTs;
 
   return (
-    <Card className="flex flex-col gap-3">
-      <div className="flex items-start justify-between gap-3">
+    <Card className="border-gradient relative flex flex-col gap-3 overflow-hidden">
+      <div className="pointer-events-none absolute -right-14 -top-14 h-40 w-40 rounded-full bg-brand-green/10 blur-3xl" />
+      <div className="relative flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs text-zinc-500">NFT mint</p>
           <AddressLink value={auction.nftMint.toBase58()} />
@@ -418,7 +420,7 @@ function AuctionCard({
         <Badge tone={ended ? "muted" : "green"}>{ended ? "ended" : "live"}</Badge>
       </div>
 
-      <div className="flex items-baseline justify-between">
+      <div className="relative flex items-baseline justify-between">
         <div>
           <span className="text-2xl font-semibold tabular-nums text-gradient">
             {hasBids ? lamportsToSol(auction.highestBid).toFixed(3) : lamportsToSol(auction.reservePrice).toFixed(3)}{" "}
