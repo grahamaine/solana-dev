@@ -166,7 +166,7 @@ fn close_ix(signer: &Pubkey, poll: &Pubkey) -> Instruction {
         voting::id(),
         &voting::instruction::ClosePoll {}.data(),
         voting::accounts::ClosePoll {
-            signer: *signer,
+            creator: *signer,
             poll: *poll,
         }
         .to_account_metas(None),
@@ -298,13 +298,11 @@ fn tallies_accumulate_across_many_voters() {
 }
 
 #[test]
-fn anyone_can_close_after_the_deadline() {
+fn creator_can_close_before_the_deadline() {
     let (mut svm, creator) = setup();
     let poll_address = active_poll(&mut svm, &creator, 1);
-    let stranger = new_voter(&mut svm);
 
-    warp_forward(&mut svm, 3601);
-    send(&mut svm, &stranger, close_ix(&stranger.pubkey(), &poll_address)).unwrap();
+    send(&mut svm, &creator, close_ix(&creator.pubkey(), &poll_address)).unwrap();
     let poll: Poll = get(&svm, &poll_address);
     assert_eq!(poll.status, PollStatus::Closed);
 }
@@ -467,12 +465,15 @@ fn voting_on_a_closed_poll_fails() {
 }
 
 #[test]
-fn strangers_cannot_close_before_the_deadline() {
+fn strangers_cannot_close_even_after_the_deadline() {
     let (mut svm, creator) = setup();
     let poll = active_poll(&mut svm, &creator, 1);
     let stranger = new_voter(&mut svm);
+
+    // Only the creator may close — passing the deadline doesn't change that.
+    warp_forward(&mut svm, 3601);
     let res = send(&mut svm, &stranger, close_ix(&stranger.pubkey(), &poll));
-    assert_fails_with(res, "PollNotEnded");
+    assert_fails_with(res, "Unauthorized");
 }
 
 #[test]

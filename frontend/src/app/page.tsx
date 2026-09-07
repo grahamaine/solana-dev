@@ -6,6 +6,7 @@ import {
   CounterIcon,
   VotingIcon,
   TokenIcon,
+  MarketplaceIcon,
 } from "@/components/ui";
 import { PROGRAM_IDS, CLUSTER } from "@/lib/constants";
 
@@ -35,6 +36,15 @@ const PROGRAMS = [
     icon: <TokenIcon />,
     status: "soon" as const,
   },
+  {
+    href: "/nft-marketplace",
+    title: "NFT Marketplace",
+    blurb:
+      "Fixed-price listings and timed auctions for existing NFTs, with a marketplace fee.",
+    id: PROGRAM_IDS.nftMarketplace.toBase58(),
+    icon: <MarketplaceIcon />,
+    status: "live" as const,
+  },
 ] as const;
 
 export default function Home() {
@@ -52,13 +62,13 @@ export default function Home() {
           program by program.
         </h1>
         <p className="mt-5 text-lg text-zinc-400">
-          A single frontend for three Anchor programs on Solana devnet. Connect a
+          A single frontend for four Anchor programs on Solana devnet. Connect a
           wallet in the top-right, then dive into any program below.
         </p>
       </section>
 
       {/* Program grid */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {PROGRAMS.map((p, i) => (
           <Link
             key={p.href}

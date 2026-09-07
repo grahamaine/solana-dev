@@ -375,3 +375,13 @@ export function TokenIcon() {
     </svg>
   );
 }
+
+export function MarketplaceIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M4 9.5 5.5 4h13L20 9.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M4 9.5h16v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5v-9Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M9 9.5a3 3 0 0 1-6 0M15 9.5a3 3 0 0 0 6 0M9 9.5a3 3 0 0 0 6 0" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+    </svg>
+  );
+}

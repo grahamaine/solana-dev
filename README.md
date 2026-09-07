@@ -25,6 +25,32 @@ Runs against **devnet**. See [`week3-tokens/`](week3-tokens/).
 | [`exercise3-spl-token/`](week3-tokens/exercise3-spl-token/) | **Your First Token**: SPL mint, token accounts, mint supply, transfer between two wallets, then a TS reader (`supply == sender + recipient`) |
 | [`exercise4-token2022/`](week3-tokens/exercise4-token2022/) | **Token-2022 extensions**: mint with **TransferFeeConfig** (observable 5% fee) + **Metadata**, then decode extension data straight off the mint account in TS |
 
+## NFT Marketplace
+
+A full Anchor marketplace program for trading existing NFTs — beyond the
+weekly exercises above. See [`nft-marketplace/`](nft-marketplace/).
+
+- **Fixed-price listings**: list, buy, cancel, update price. NFTs are
+  escrowed in a PDA-owned token account for the life of the listing.
+- **Timed English auctions**: create, bid (previous highest bidder is
+  refunded automatically), settle after the end time, or cancel while no
+  bids have been placed.
+- **Marketplace fee**: a configurable basis-point cut of every sale goes to
+  a PDA treasury; only the marketplace authority can withdraw it.
+- 10 LiteSVM integration tests cover both flows end-to-end, including the
+  fee split and every failure path (unauthorized cancel, bid below reserve,
+  cancelling an auction that already has bids, etc).
+
+Deployed to devnet: [`DPZVLmiip36N4TnJBghu7opiZTBx6C4LBH4j9WhRPEpN`](https://explorer.solana.com/address/DPZVLmiip36N4TnJBghu7opiZTBx6C4LBH4j9WhRPEpN?cluster=devnet).
+Wired into the shared frontend at `/nft-marketplace`.
+
+## Frontend
+
+A shared Next.js app under [`frontend/`](frontend/) wires up the wallet
+adapter and a page per program (Counter, Voting, Token System, NFT
+Marketplace), all pointed at devnet. Live at
+[solana-dev-frontend.vercel.app](https://solana-dev-frontend.vercel.app).
+
 ## Toolchain
 
 | Tool | Version |

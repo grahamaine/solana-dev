@@ -18,6 +18,7 @@ export const PROGRAM_IDS = {
   counter: new PublicKey("68pjM74E2ow8dRxKPCh1cjcaHYEpAtjJRPJmxstQNCVp"),
   voting: new PublicKey("2QaArRLt7zTe3orXxpv1Epx9v5a4Ga9KbCp5655QbCtg"),
   tokenSystem: new PublicKey("7yzFYbiTKKjqyLmNUpBidXs8kRgn7BcpJJAN3NKQvkg5"),
+  nftMarketplace: new PublicKey("DPZVLmiip36N4TnJBghu7opiZTBx6C4LBH4j9WhRPEpN"),
 } as const;
 
 export const EXPLORER = "https://explorer.solana.com";

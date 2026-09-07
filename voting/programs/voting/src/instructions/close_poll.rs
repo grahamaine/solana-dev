@@ -6,10 +6,11 @@ use crate::state::{Poll, PollStatus};
 
 #[derive(Accounts)]
 pub struct ClosePoll<'info> {
-    pub signer: Signer<'info>,
+    pub creator: Signer<'info>,
 
     #[account(
         mut,
+        has_one = creator @ VotingError::Unauthorized,
         seeds = [POLL_SEED, poll.creator.as_ref(), &poll.poll_id.to_le_bytes()],
         bump = poll.bump,
     )]
@@ -19,13 +20,6 @@ pub struct ClosePoll<'info> {
 pub fn handler(ctx: Context<ClosePoll>) -> Result<()> {
     let poll = &mut ctx.accounts.poll;
     require!(poll.status == PollStatus::Active, VotingError::PollNotActive);
-
-    // The creator may close early; anyone else only after the voting period.
-    if ctx.accounts.signer.key() != poll.creator {
-        let now = Clock::get()?.unix_timestamp;
-        require!(now >= poll.end_time, VotingError::PollNotEnded);
-    }
-
     poll.status = PollStatus::Closed;
     Ok(())
 }
