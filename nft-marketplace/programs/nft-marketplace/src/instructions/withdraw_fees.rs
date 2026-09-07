@@ -7,7 +7,7 @@ use crate::state::Marketplace;
 
 #[derive(Accounts)]
 pub struct WithdrawFees<'info> {
-    #[account(mut, address = marketplace.authority)]
+    #[account(mut, address = marketplace.authority @ MarketplaceError::Unauthorized)]
     pub authority: Signer<'info>,
 
     #[account(seeds = [MARKETPLACE_SEED], bump = marketplace.bump)]

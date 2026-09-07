@@ -21,7 +21,7 @@ pub struct CancelAuction<'info> {
         close = seller,
         seeds = [AUCTION_SEED, nft_mint.key().as_ref()],
         bump = auction.bump,
-        has_one = seller,
+        has_one = seller @ MarketplaceError::Unauthorized,
         has_one = nft_mint,
     )]
     pub auction: Account<'info, Auction>,

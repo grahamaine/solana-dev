@@ -514,7 +514,7 @@ fn non_seller_cannot_cancel_listing() {
     // Building the instruction with the stranger as "seller" fails the
     // has_one=seller constraint (and the stranger has no NFT ATA either way).
     let res = send(&mut svm, &stranger, cancel_listing_ix(&stranger.pubkey(), &mint));
-    assert!(res.is_err());
+    assert_fails_with(res, "Unauthorized");
 }
 
 #[test]
@@ -563,7 +563,7 @@ fn withdraw_fees_by_non_authority_fails() {
 
     let stranger = new_wallet(&mut svm, 5_000_000_000);
     let res = send(&mut svm, &stranger, withdraw_fees_ix(&stranger.pubkey(), 1));
-    assert!(res.is_err());
+    assert_fails_with(res, "Unauthorized");
 }
 
 #[test]
@@ -590,4 +590,188 @@ fn withdraw_fees_by_authority_succeeds_after_a_sale() {
     let authority_after = balance(&svm, &authority.pubkey());
     assert!(authority_after > authority_before);
     assert!(authority_after >= authority_before + fee - 10_000);
+}
+
+#[test]
+fn create_listing_with_zero_price_fails() {
+    let (mut svm, authority) = setup();
+    init_marketplace(&mut svm, &authority);
+
+    let seller = new_wallet(&mut svm, 5_000_000_000);
+    let mint = mint_nft(&mut svm, &seller);
+
+    let res = send(&mut svm, &seller, create_listing_ix(&seller.pubkey(), &mint, 0));
+    assert_fails_with(res, "Price must be greater than zero");
+}
+
+#[test]
+fn update_listing_price_to_zero_fails() {
+    let (mut svm, authority) = setup();
+    init_marketplace(&mut svm, &authority);
+
+    let seller = new_wallet(&mut svm, 5_000_000_000);
+    let mint = mint_nft(&mut svm, &seller);
+    send(&mut svm, &seller, create_listing_ix(&seller.pubkey(), &mint, 1_000_000_000)).unwrap();
+
+    let res = send(&mut svm, &seller, update_listing_price_ix(&seller.pubkey(), &mint, 0));
+    assert_fails_with(res, "Price must be greater than zero");
+}
+
+#[test]
+fn update_listing_price_by_non_seller_fails() {
+    let (mut svm, authority) = setup();
+    init_marketplace(&mut svm, &authority);
+
+    let seller = new_wallet(&mut svm, 5_000_000_000);
+    let stranger = new_wallet(&mut svm, 5_000_000_000);
+    let mint = mint_nft(&mut svm, &seller);
+    send(&mut svm, &seller, create_listing_ix(&seller.pubkey(), &mint, 1_000_000_000)).unwrap();
+
+    let res = send(
+        &mut svm,
+        &stranger,
+        update_listing_price_ix(&stranger.pubkey(), &mint, 2_000_000_000),
+    );
+    assert_fails_with(res, "Unauthorized");
+}
+
+#[test]
+fn create_auction_with_zero_reserve_fails() {
+    let (mut svm, authority) = setup();
+    init_marketplace(&mut svm, &authority);
+
+    let seller = new_wallet(&mut svm, 5_000_000_000);
+    let mint = mint_nft(&mut svm, &seller);
+    let now = svm.get_sysvar::<Clock>().unix_timestamp;
+
+    let res = send(&mut svm, &seller, create_auction_ix(&seller.pubkey(), &mint, 0, now + 3600));
+    assert_fails_with(res, "Price must be greater than zero");
+}
+
+#[test]
+fn create_auction_with_past_end_time_fails() {
+    let (mut svm, authority) = setup();
+    init_marketplace(&mut svm, &authority);
+
+    let seller = new_wallet(&mut svm, 5_000_000_000);
+    let mint = mint_nft(&mut svm, &seller);
+    let now = svm.get_sysvar::<Clock>().unix_timestamp;
+
+    let res = send(
+        &mut svm,
+        &seller,
+        create_auction_ix(&seller.pubkey(), &mint, 1_000_000_000, now - 1),
+    );
+    assert_fails_with(res, "Auction end time must be in the future");
+}
+
+#[test]
+fn initialize_marketplace_with_excessive_fee_fails() {
+    let (mut svm, authority) = setup();
+    let res = send(&mut svm, &authority, init_marketplace_ix(&authority.pubkey(), 1_001));
+    assert_fails_with(res, "Fee exceeds the maximum allowed basis points");
+}
+
+#[test]
+fn settle_auction_before_end_time_fails() {
+    let (mut svm, authority) = setup();
+    init_marketplace(&mut svm, &authority);
+
+    let seller = new_wallet(&mut svm, 5_000_000_000);
+    let bidder = new_wallet(&mut svm, 5_000_000_000);
+    let mint = mint_nft(&mut svm, &seller);
+
+    let now = svm.get_sysvar::<Clock>().unix_timestamp;
+    let reserve = 1_000_000_000u64;
+    send(&mut svm, &seller, create_auction_ix(&seller.pubkey(), &mint, reserve, now + 3600)).unwrap();
+    send(&mut svm, &bidder, place_bid_ix(&bidder.pubkey(), &mint, &bidder.pubkey(), reserve)).unwrap();
+
+    // Plenty of time left — settling now must fail rather than let anyone
+    // force an early payout.
+    let res = send(
+        &mut svm,
+        &bidder,
+        settle_auction_ix(&bidder.pubkey(), &seller.pubkey(), &bidder.pubkey(), &mint),
+    );
+    assert_fails_with(res, "Auction has not ended yet");
+}
+
+#[test]
+fn settle_auction_with_no_bids_fails() {
+    let (mut svm, authority) = setup();
+    init_marketplace(&mut svm, &authority);
+
+    let seller = new_wallet(&mut svm, 5_000_000_000);
+    let mint = mint_nft(&mut svm, &seller);
+
+    let now = svm.get_sysvar::<Clock>().unix_timestamp;
+    send(&mut svm, &seller, create_auction_ix(&seller.pubkey(), &mint, 1_000_000_000, now + 3600)).unwrap();
+    warp_forward(&mut svm, 3601);
+
+    // No one ever bid — there is no highest bidder to pay out to, so
+    // settle_auction must fail (cancel_auction is the correct instruction
+    // for this case instead).
+    let res = send(
+        &mut svm,
+        &seller,
+        settle_auction_ix(&seller.pubkey(), &seller.pubkey(), &seller.pubkey(), &mint),
+    );
+    assert_fails_with(res, "Auction has no bids to settle");
+}
+
+#[test]
+fn place_bid_after_auction_ended_fails() {
+    let (mut svm, authority) = setup();
+    init_marketplace(&mut svm, &authority);
+
+    let seller = new_wallet(&mut svm, 5_000_000_000);
+    let bidder = new_wallet(&mut svm, 5_000_000_000);
+    let mint = mint_nft(&mut svm, &seller);
+
+    let now = svm.get_sysvar::<Clock>().unix_timestamp;
+    send(&mut svm, &seller, create_auction_ix(&seller.pubkey(), &mint, 1_000_000_000, now + 3600)).unwrap();
+    warp_forward(&mut svm, 3601);
+
+    let res = send(
+        &mut svm,
+        &bidder,
+        place_bid_ix(&bidder.pubkey(), &mint, &bidder.pubkey(), 1_000_000_000),
+    );
+    assert_fails_with(res, "Auction has already ended");
+}
+
+#[test]
+fn place_bid_with_wrong_previous_bidder_account_fails() {
+    let (mut svm, authority) = setup();
+    init_marketplace(&mut svm, &authority);
+
+    let seller = new_wallet(&mut svm, 5_000_000_000);
+    let bidder_a = new_wallet(&mut svm, 5_000_000_000);
+    let bidder_b = new_wallet(&mut svm, 5_000_000_000);
+    let stranger = new_wallet(&mut svm, 5_000_000_000);
+    let mint = mint_nft(&mut svm, &seller);
+
+    let now = svm.get_sysvar::<Clock>().unix_timestamp;
+    let reserve = 1_000_000_000u64;
+    send(&mut svm, &seller, create_auction_ix(&seller.pubkey(), &mint, reserve, now + 3600)).unwrap();
+    send(&mut svm, &bidder_a, place_bid_ix(&bidder_a.pubkey(), &mint, &bidder_a.pubkey(), reserve)).unwrap();
+
+    // bidder_b outbids but points "previous_bidder" at an unrelated wallet —
+    // must not be able to redirect bidder_a's refund elsewhere.
+    let res = send(
+        &mut svm,
+        &bidder_b,
+        place_bid_ix(&bidder_b.pubkey(), &mint, &stranger.pubkey(), reserve + 500_000_000),
+    );
+    assert_fails_with(res, "does not match the current highest bidder");
+}
+
+#[test]
+fn withdraw_fees_more_than_treasury_fails() {
+    let (mut svm, authority) = setup();
+    init_marketplace(&mut svm, &authority);
+
+    // Treasury is empty — even a 1-lamport withdrawal must fail.
+    let res = send(&mut svm, &authority, withdraw_fees_ix(&authority.pubkey(), 1));
+    assert_fails_with(res, "Insufficient funds in the treasury");
 }

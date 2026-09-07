@@ -12,7 +12,7 @@ pub struct UpdateListingPrice<'info> {
         mut,
         seeds = [LISTING_SEED, listing.nft_mint.as_ref()],
         bump = listing.bump,
-        has_one = seller,
+        has_one = seller @ MarketplaceError::Unauthorized,
     )]
     pub listing: Account<'info, Listing>,
 }

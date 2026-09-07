@@ -6,6 +6,7 @@ use anchor_spl::token_interface::{
 };
 
 use crate::constants::*;
+use crate::error::MarketplaceError;
 use crate::state::Listing;
 
 #[derive(Accounts)]
@@ -20,7 +21,7 @@ pub struct CancelListing<'info> {
         close = seller,
         seeds = [LISTING_SEED, nft_mint.key().as_ref()],
         bump = listing.bump,
-        has_one = seller,
+        has_one = seller @ MarketplaceError::Unauthorized,
         has_one = nft_mint,
     )]
     pub listing: Account<'info, Listing>,
