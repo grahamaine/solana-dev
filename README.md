@@ -1,9 +1,36 @@
 # solana-dev
 
-Solana development workspace — course exercises, built with Anchor and
-tested against LiteSVM (no validator needed: `cargo test`).
+Solana development workspace — Encode Solana Developer Course. Built with
+Anchor, tested against LiteSVM (no validator needed: `cargo test`).
 
-## Week 2 exercises
+## 🏁 Capstone: NFT Marketplace
+
+**This is the course capstone submission** (Week 6, Project Option 2 — "List
+and buy NFTs atomically"). Everything else in this repo is the weeks 2-5
+coursework it was built from. See [`nft-marketplace/README.md`](nft-marketplace/README.md)
+for the full write-up: architecture, runbook, and trade-offs.
+
+| | |
+|---|---|
+| **Deployed program** | [`DPZVLmiip36N4TnJBghu7opiZTBx6C4LBH4j9WhRPEpN`](https://explorer.solana.com/address/DPZVLmiip36N4TnJBghu7opiZTBx6C4LBH4j9WhRPEpN?cluster=devnet) (devnet) |
+| **Live app** | [solana-dev-frontend.vercel.app/nft-marketplace](https://solana-dev-frontend.vercel.app/nft-marketplace) |
+| **Source** | [`nft-marketplace/`](nft-marketplace/) |
+| **Tests** | 10 LiteSVM integration tests, happy paths + failure paths |
+
+Fixed-price listings (list / buy / cancel / update price) and timed English
+auctions (create / bid with automatic outbid refunds / settle / cancel), NFTs
+escrowed in PDA-owned token accounts, a configurable marketplace fee paid to
+a PDA treasury. Combines PDA-based on-chain state and authority checks
+(from `counter`/`voting`), SPL token operations (from `token-system`/
+`week3-tokens`), CPI composability into the SPL Token program, and a working
+frontend — the four building blocks the capstone brief asks for.
+
+## Weekly coursework (building blocks)
+
+The capstone above draws on the exercises below; each still builds and
+tests independently.
+
+### Week 2 exercises
 
 | Exercise | Covers |
 |----------|--------|
@@ -14,7 +41,7 @@ tested against LiteSVM (no validator needed: `cargo test`).
 Each exercise builds with `anchor build` and tests with `cargo test` from
 its own directory.
 
-## Week 3 exercises
+### Week 3 exercises
 
 CLI-first this week: use the `spl-token` CLI to create/mint/inspect, then read
 the same state back in TypeScript (`@solana/web3.js` + `@solana/spl-token`).
@@ -25,31 +52,13 @@ Runs against **devnet**. See [`week3-tokens/`](week3-tokens/).
 | [`exercise3-spl-token/`](week3-tokens/exercise3-spl-token/) | **Your First Token**: SPL mint, token accounts, mint supply, transfer between two wallets, then a TS reader (`supply == sender + recipient`) |
 | [`exercise4-token2022/`](week3-tokens/exercise4-token2022/) | **Token-2022 extensions**: mint with **TransferFeeConfig** (observable 5% fee) + **Metadata**, then decode extension data straight off the mint account in TS |
 
-## NFT Marketplace
-
-A full Anchor marketplace program for trading existing NFTs — beyond the
-weekly exercises above. See [`nft-marketplace/`](nft-marketplace/).
-
-- **Fixed-price listings**: list, buy, cancel, update price. NFTs are
-  escrowed in a PDA-owned token account for the life of the listing.
-- **Timed English auctions**: create, bid (previous highest bidder is
-  refunded automatically), settle after the end time, or cancel while no
-  bids have been placed.
-- **Marketplace fee**: a configurable basis-point cut of every sale goes to
-  a PDA treasury; only the marketplace authority can withdraw it.
-- 10 LiteSVM integration tests cover both flows end-to-end, including the
-  fee split and every failure path (unauthorized cancel, bid below reserve,
-  cancelling an auction that already has bids, etc).
-
-Deployed to devnet: [`DPZVLmiip36N4TnJBghu7opiZTBx6C4LBH4j9WhRPEpN`](https://explorer.solana.com/address/DPZVLmiip36N4TnJBghu7opiZTBx6C4LBH4j9WhRPEpN?cluster=devnet).
-Wired into the shared frontend at `/nft-marketplace`.
-
 ## Frontend
 
 A shared Next.js app under [`frontend/`](frontend/) wires up the wallet
-adapter and a page per program (Counter, Voting, Token System, NFT
-Marketplace), all pointed at devnet. Live at
-[solana-dev-frontend.vercel.app](https://solana-dev-frontend.vercel.app).
+adapter and a page per program (Counter, Voting, Token System, and the
+**NFT Marketplace capstone**), all pointed at devnet. Live at
+[solana-dev-frontend.vercel.app](https://solana-dev-frontend.vercel.app) —
+start with `/nft-marketplace`.
 
 ## Toolchain
 
@@ -72,8 +81,8 @@ node --version
 solana --version
 anchor --version
 
-# build + test an exercise
-cd voting && anchor build && cargo test
+# build + test the capstone
+cd nft-marketplace && anchor build && cargo test
 ```
 
 ## Notes
