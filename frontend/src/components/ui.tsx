@@ -183,7 +183,7 @@ export function ProgramHeader({
 }: {
   title: string;
   programId: string;
-  instructions: string[];
+  instructions?: string[];
   icon?: React.ReactNode;
   children?: React.ReactNode;
 }) {
@@ -211,16 +211,18 @@ export function ProgramHeader({
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-1.5">
-        {instructions.map((ix) => (
-          <code
-            key={ix}
-            className="rounded-md border border-white/[.06] bg-white/[.04] px-2 py-0.5 font-mono text-xs text-zinc-400"
-          >
-            {ix}
-          </code>
-        ))}
-      </div>
+      {instructions && instructions.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-1.5">
+          {instructions.map((ix) => (
+            <code
+              key={ix}
+              className="rounded-md border border-white/[.06] bg-white/[.04] px-2 py-0.5 font-mono text-xs text-zinc-400"
+            >
+              {ix}
+            </code>
+          ))}
+        </div>
+      )}
       {children}
     </div>
   );

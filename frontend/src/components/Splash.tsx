@@ -30,16 +30,17 @@ export function Splash() {
       }`}
       aria-hidden={fading}
     >
-      <Image
-        src="/splash-hero.jpg"
-        alt=""
-        fill
-        priority
-        className="animate-splash-pop object-cover"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#07060c] via-transparent to-[#07060c]/40" />
+      <div className="flex h-full flex-col items-center justify-center gap-8 px-6">
+        <div className="animate-splash-pop relative h-48 w-48 overflow-hidden rounded-3xl shadow-[0_0_60px_-10px_rgba(153,69,255,0.5)] sm:h-56 sm:w-56">
+          <Image
+            src="/splash-hero.jpg"
+            alt=""
+            fill
+            priority
+            className="object-cover"
+          />
+        </div>
 
-      <div className="relative flex h-full flex-col items-center justify-end gap-4 pb-16">
         <p
           className="animate-splash-pop text-lg font-semibold tracking-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]"
           style={{ animationDelay: "150ms" }}

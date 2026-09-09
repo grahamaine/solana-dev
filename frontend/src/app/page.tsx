@@ -24,18 +24,6 @@ export default function Home() {
       <ProgramHeader
         title="Neon NFT Portal"
         programId={PROGRAM_IDS.nftMarketplace.toBase58()}
-        instructions={[
-          "initialize_marketplace",
-          "create_listing",
-          "buy_listing",
-          "cancel_listing",
-          "update_listing_price",
-          "create_auction",
-          "place_bid",
-          "settle_auction",
-          "cancel_auction",
-          "withdraw_fees",
-        ]}
         icon={<MarketplaceIcon />}
       />
       <div className="mb-6">
@@ -48,9 +36,18 @@ export default function Home() {
   );
 }
 
+const TYPE_FILTERS = [
+  { id: "all", label: "All" },
+  { id: "listings", label: "Listings" },
+  { id: "auctions", label: "Auctions" },
+] as const;
+type TypeFilter = (typeof TYPE_FILTERS)[number]["id"];
+
 function MarketplaceApp() {
   const m = useNftMarketplace();
   const { refresh, refreshOwnedNfts } = m;
+  const [search, setSearch] = useState("");
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
 
   useEffect(() => {
     refresh();
@@ -59,6 +56,19 @@ function MarketplaceApp() {
 
   const isAuthority =
     m.marketplace && m.wallet?.publicKey.equals(m.marketplace.authority);
+
+  const query = search.trim().toLowerCase();
+  const matches = (mint: string, seller: string) =>
+    !query || mint.toLowerCase().includes(query) || seller.toLowerCase().includes(query);
+
+  const filteredListings = m.listings.filter((l) =>
+    matches(l.nftMint.toBase58(), l.seller.toBase58())
+  );
+  const filteredAuctions = m.auctions.filter((a) =>
+    matches(a.nftMint.toBase58(), a.seller.toBase58())
+  );
+  const showListings = typeFilter !== "auctions";
+  const showAuctions = typeFilter !== "listings";
 
   return (
     <div className="animate-rise flex flex-col gap-6">
@@ -91,44 +101,86 @@ function MarketplaceApp() {
 
       {m.marketplace && <ListOrAuctionForm marketplace={m} />}
 
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-medium uppercase tracking-wider text-zinc-500">
-          Listings {m.listings.length > 0 && `· ${m.listings.length}`}
-        </h2>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="relative flex-1">
+          <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500">
+            <SearchIcon />
+          </span>
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by NFT mint or seller address"
+            className="rounded-full pl-10"
+          />
+        </div>
+        <div className="flex shrink-0 gap-1 rounded-full border border-white/[.1] bg-white/[.03] p-1 text-sm">
+          {TYPE_FILTERS.map((f) => (
+            <button
+              key={f.id}
+              onClick={() => setTypeFilter(f.id)}
+              className={`rounded-full px-3.5 py-1.5 transition-colors ${
+                typeFilter === f.id ? "bg-white/[.1] text-zinc-100" : "text-zinc-500 hover:text-zinc-300"
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
         <button
           onClick={() => refresh()}
-          className="inline-flex items-center gap-1.5 text-xs text-zinc-500 transition-colors hover:text-zinc-300"
+          className="inline-flex shrink-0 items-center gap-1.5 self-start text-xs text-zinc-500 transition-colors hover:text-zinc-300 sm:self-auto"
         >
           {m.loading ? <Spinner /> : "↻"} Refresh
         </button>
       </div>
-      {m.listings.length === 0 ? (
-        <Card className="border-dashed py-8 text-center text-sm text-zinc-500">
-          No active listings.
-        </Card>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {m.listings.map((l) => (
-            <ListingCard key={l.pubkey.toBase58()} listing={l} marketplace={m} />
-          ))}
-        </div>
+
+      {showListings && (
+        <>
+          <h2 className="text-sm font-medium uppercase tracking-wider text-zinc-500">
+            Listings {filteredListings.length > 0 && `· ${filteredListings.length}`}
+          </h2>
+          {filteredListings.length === 0 ? (
+            <Card className="border-dashed py-8 text-center text-sm text-zinc-500">
+              {m.listings.length === 0 ? "No active listings." : "No listings match your search."}
+            </Card>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {filteredListings.map((l) => (
+                <ListingCard key={l.pubkey.toBase58()} listing={l} marketplace={m} />
+              ))}
+            </div>
+          )}
+        </>
       )}
 
-      <h2 className="text-sm font-medium uppercase tracking-wider text-zinc-500">
-        Auctions {m.auctions.length > 0 && `· ${m.auctions.length}`}
-      </h2>
-      {m.auctions.length === 0 ? (
-        <Card className="border-dashed py-8 text-center text-sm text-zinc-500">
-          No active auctions.
-        </Card>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {m.auctions.map((a) => (
-            <AuctionCard key={a.pubkey.toBase58()} auction={a} marketplace={m} />
-          ))}
-        </div>
+      {showAuctions && (
+        <>
+          <h2 className="text-sm font-medium uppercase tracking-wider text-zinc-500">
+            Auctions {filteredAuctions.length > 0 && `· ${filteredAuctions.length}`}
+          </h2>
+          {filteredAuctions.length === 0 ? (
+            <Card className="border-dashed py-8 text-center text-sm text-zinc-500">
+              {m.auctions.length === 0 ? "No active auctions." : "No auctions match your search."}
+            </Card>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {filteredAuctions.map((a) => (
+                <AuctionCard key={a.pubkey.toBase58()} auction={a} marketplace={m} />
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
+      <path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
   );
 }
 
