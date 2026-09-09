@@ -1,17 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { WalletButton } from "@/components/WalletButton";
 import { useBalance } from "@/components/useBalance";
 import { CLUSTER } from "@/lib/constants";
 
 const LINKS = [
-  { href: "/", label: "Home" },
-  { href: "/counter", label: "Counter" },
-  { href: "/voting", label: "Voting" },
-  { href: "/token", label: "Token" },
-  { href: "/nft-marketplace", label: "Neon Portal" },
+  { href: "/", label: "Marketplace" },
+  { href: "/portal", label: "Portal" },
+  { href: "/collections", label: "Collections" },
+  { href: "/rewards", label: "Rewards" },
 ] as const;
 
 export function Nav() {
@@ -23,8 +23,8 @@ export function Nav() {
       <nav className="mx-auto flex max-w-5xl items-center gap-4 px-4 py-3">
         <Link href="/" className="group flex items-center gap-2.5">
           <LogoMark />
-          <span className="text-[15px] font-semibold tracking-tight">
-            solana<span className="text-gradient">-dev</span>
+          <span className="hidden text-[15px] font-semibold tracking-tight sm:inline">
+            Neon <span className="text-gradient">NFT Portal</span>
           </span>
         </Link>
 
@@ -66,6 +66,24 @@ export function Nav() {
           <WalletButton />
         </div>
       </nav>
+
+      {/* Mobile nav (LINKS hidden above sm:) */}
+      <div className="flex gap-1 overflow-x-auto px-4 pb-2 sm:hidden">
+        {LINKS.map((l) => {
+          const active = l.href === "/" ? pathname === "/" : pathname.startsWith(l.href);
+          return (
+            <Link
+              key={l.href}
+              href={l.href}
+              className={`shrink-0 rounded-lg px-3 py-1.5 text-sm transition-colors ${
+                active ? "bg-white/[.08] font-medium text-white" : "text-zinc-400"
+              }`}
+            >
+              {l.label}
+            </Link>
+          );
+        })}
+      </div>
     </header>
   );
 }
@@ -73,17 +91,7 @@ export function Nav() {
 function LogoMark() {
   return (
     <span className="relative grid h-8 w-8 place-items-center overflow-hidden rounded-lg bg-[#0d0b16] ring-1 ring-white/10 transition-shadow group-hover:shadow-[0_0_18px_-4px_rgba(153,69,255,0.7)]">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden>
-        <defs>
-          <linearGradient id="logo-g" x1="0" y1="0" x2="24" y2="24">
-            <stop stopColor="#9945FF" />
-            <stop offset="1" stopColor="#14F195" />
-          </linearGradient>
-        </defs>
-        <path d="M6 8.5h10.5L14 11H3.5L6 8.5Z" fill="url(#logo-g)" />
-        <path d="M6 12.75h10.5L14 15.25H3.5L6 12.75Z" fill="url(#logo-g)" opacity="0.85" />
-        <path d="M8 4.25h12.5L18 6.75H5.5L8 4.25Z" fill="url(#logo-g)" opacity="0.7" />
-      </svg>
+      <Image src="/logo.png" alt="" fill className="object-contain p-0.5" />
     </span>
   );
 }

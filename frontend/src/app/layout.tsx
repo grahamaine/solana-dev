@@ -16,9 +16,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "solana-dev · Devnet dApp",
+  title: "Neon NFT Portal · Devnet dApp",
   description:
-    "Devnet frontend for the counter, voting, and token-system Anchor programs.",
+    "Solana devnet NFT marketplace: fixed-price listings, timed auctions, a per-wallet portal, collections, and rewards.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

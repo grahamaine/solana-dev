@@ -10,14 +10,10 @@ export const RPC_URL =
   process.env.NEXT_PUBLIC_RPC_URL ?? "https://api.devnet.solana.com";
 
 /**
- * On-chain program IDs (declare_id! in each Anchor program).
- * These are the addresses the programs deploy to on devnet.
+ * On-chain program ID (declare_id! in the Anchor program) this dApp talks
+ * to on devnet.
  */
 export const PROGRAM_IDS = {
-  anchorStarter: new PublicKey("5QHECrupbXq7KZdpoEo14iE7mJ5UFek4m38Q2Q38NpXU"),
-  counter: new PublicKey("68pjM74E2ow8dRxKPCh1cjcaHYEpAtjJRPJmxstQNCVp"),
-  voting: new PublicKey("2QaArRLt7zTe3orXxpv1Epx9v5a4Ga9KbCp5655QbCtg"),
-  tokenSystem: new PublicKey("7yzFYbiTKKjqyLmNUpBidXs8kRgn7BcpJJAN3NKQvkg5"),
   nftMarketplace: new PublicKey("DPZVLmiip36N4TnJBghu7opiZTBx6C4LBH4j9WhRPEpN"),
 } as const;
 

@@ -44,7 +44,7 @@ export function Splash() {
           className="animate-splash-pop text-lg font-semibold tracking-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]"
           style={{ animationDelay: "150ms" }}
         >
-          solana<span className="text-gradient">-dev</span>
+          Neon <span className="text-gradient">NFT Portal</span>
         </p>
 
         <div className="h-1 w-28 overflow-hidden rounded-full bg-white/[.12]">
