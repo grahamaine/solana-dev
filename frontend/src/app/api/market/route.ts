@@ -20,36 +20,51 @@ const COLLECTIONS = [
   { symbol: "degods", name: "DeGods" },
   { symbol: "solana_monkey_business", name: "SMB" },
   { symbol: "y00ts", name: "y00ts" },
+  { symbol: "mad_lads", name: "Mad Lads" },
+  { symbol: "claynosaurz", name: "Claynosaurz" },
+  { symbol: "famous_fox_federation", name: "Famous Fox Federation" },
+  { symbol: "the_heist_by_dreadfulz", name: "The Heist" },
 ] as const;
 
 export type MarketCollection = {
   symbol: string;
   name: string;
+  image: string | null;
   floorPriceLamports: number | null;
   listedCount: number | null;
+  volume7dLamports: number | null;
 };
 
-export async function GET() {
-  const collections: MarketCollection[] = await Promise.all(
-    COLLECTIONS.map(async ({ symbol, name }) => {
-      try {
-        const res = await fetch(
-          `https://api-mainnet.magiceden.dev/v2/collections/${symbol}/stats`,
-          { next: { revalidate: 60 } }
-        );
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = (await res.json()) as { floorPrice?: number; listedCount?: number };
-        return {
-          symbol,
-          name,
-          floorPriceLamports: data.floorPrice ?? null,
-          listedCount: data.listedCount ?? null,
-        };
-      } catch {
-        return { symbol, name, floorPriceLamports: null, listedCount: null };
-      }
-    })
-  );
+async function fetchOne({ symbol, name }: (typeof COLLECTIONS)[number]): Promise<MarketCollection> {
+  try {
+    const [statsRes, infoRes] = await Promise.all([
+      fetch(`https://api-mainnet.magiceden.dev/v2/collections/${symbol}/stats`, {
+        next: { revalidate: 60 },
+      }),
+      fetch(`https://api-mainnet.magiceden.dev/v2/collections/${symbol}`, {
+        next: { revalidate: 300 },
+      }),
+    ]);
 
+    const stats = statsRes.ok
+      ? ((await statsRes.json()) as { floorPrice?: number; listedCount?: number; volume7d?: number })
+      : null;
+    const info = infoRes.ok ? ((await infoRes.json()) as { image?: string }) : null;
+
+    return {
+      symbol,
+      name,
+      image: info?.image ?? null,
+      floorPriceLamports: stats?.floorPrice ?? null,
+      listedCount: stats?.listedCount ?? null,
+      volume7dLamports: stats?.volume7d ?? null,
+    };
+  } catch {
+    return { symbol, name, image: null, floorPriceLamports: null, listedCount: null, volume7dLamports: null };
+  }
+}
+
+export async function GET() {
+  const collections = await Promise.all(COLLECTIONS.map(fetchOne));
   return NextResponse.json({ collections, fetchedAt: Date.now() });
 }
