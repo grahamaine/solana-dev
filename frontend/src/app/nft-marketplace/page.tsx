@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import {
   Container,
   ProgramHeader,
@@ -14,6 +15,7 @@ import {
   Spinner,
   MarketplaceIcon,
 } from "@/components/ui";
+import { MarketPanel } from "@/components/MarketPanel";
 import { PROGRAM_IDS } from "@/lib/constants";
 import {
   useNftMarketplace,
@@ -44,6 +46,9 @@ export default function NftMarketplacePage() {
         ]}
         icon={<MarketplaceIcon />}
       />
+      <div className="mb-6">
+        <MarketPanel />
+      </div>
       <WalletGate>
         <MarketplaceApp />
       </WalletGate>
@@ -90,6 +95,8 @@ function MarketplaceApp() {
         </Card>
       )}
 
+      {m.wallet && <YourNfts nfts={m.ownedNfts} />}
+
       {m.marketplace && <ListOrAuctionForm marketplace={m} />}
 
       <div className="flex items-center justify-between">
@@ -129,6 +136,43 @@ function MarketplaceApp() {
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+/* ------------------------------ Your NFTs ------------------------------ */
+
+function YourNfts({ nfts }: { nfts: OwnedNft[] }) {
+  if (nfts.length === 0) return null;
+
+  return (
+    <div className="flex flex-col gap-3">
+      <h2 className="text-sm font-medium uppercase tracking-wider text-zinc-500">
+        Your NFTs · {nfts.length}
+      </h2>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
+        {nfts.map((n) => (
+          <div
+            key={n.mint.toBase58()}
+            className="overflow-hidden rounded-xl border border-white/[.07] bg-white/[.02]"
+          >
+            <div className="relative aspect-square bg-white/[.03]">
+              {n.image ? (
+                <Image src={n.image} alt={n.name ?? ""} fill unoptimized className="object-cover" />
+              ) : (
+                <div className="flex h-full items-center justify-center text-zinc-600">
+                  <MarketplaceIcon />
+                </div>
+              )}
+            </div>
+            <div className="p-2">
+              <p className="truncate text-xs text-zinc-300">
+                {n.name === undefined ? "Loading…" : n.name ?? `${n.mint.toBase58().slice(0, 6)}…`}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
