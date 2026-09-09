@@ -25,21 +25,31 @@ export function Splash() {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-[#07060c] transition-opacity duration-400 ${
+      className={`fixed inset-0 z-50 overflow-hidden bg-[#07060c] transition-opacity duration-400 ${
         fading ? "pointer-events-none opacity-0" : "opacity-100"
       }`}
       aria-hidden={fading}
     >
-      <div className="animate-splash-pop relative h-28 w-28 drop-shadow-[0_0_50px_rgba(153,69,255,0.5)]">
-        <Image src="/logo.png" alt="" fill priority className="object-contain" />
-      </div>
+      <Image
+        src="/splash-hero.jpg"
+        alt=""
+        fill
+        priority
+        className="animate-splash-pop object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#07060c] via-transparent to-[#07060c]/40" />
 
-      <p className="animate-splash-pop text-lg font-semibold tracking-tight" style={{ animationDelay: "80ms" }}>
-        solana<span className="text-gradient">-dev</span>
-      </p>
+      <div className="relative flex h-full flex-col items-center justify-end gap-4 pb-16">
+        <p
+          className="animate-splash-pop text-lg font-semibold tracking-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]"
+          style={{ animationDelay: "150ms" }}
+        >
+          solana<span className="text-gradient">-dev</span>
+        </p>
 
-      <div className="h-1 w-28 overflow-hidden rounded-full bg-white/[.08]">
-        <div className="h-full w-1/2 rounded-full bg-[linear-gradient(90deg,#9945ff,#14f195)] animate-splash-bar" />
+        <div className="h-1 w-28 overflow-hidden rounded-full bg-white/[.12]">
+          <div className="h-full w-1/2 rounded-full bg-[linear-gradient(90deg,#9945ff,#14f195)] animate-splash-bar" />
+        </div>
       </div>
     </div>
   );
