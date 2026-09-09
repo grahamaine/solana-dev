@@ -13,9 +13,9 @@ for the full write-up: architecture, runbook, and trade-offs.
 | | |
 |---|---|
 | **Deployed program** | [`DPZVLmiip36N4TnJBghu7opiZTBx6C4LBH4j9WhRPEpN`](https://explorer.solana.com/address/DPZVLmiip36N4TnJBghu7opiZTBx6C4LBH4j9WhRPEpN?cluster=devnet) (devnet) |
-| **Live app** | [solana-dev-frontend.vercel.app/nft-marketplace](https://solana-dev-frontend.vercel.app/nft-marketplace) |
-| **Source** | [`nft-marketplace/`](nft-marketplace/) |
-| **Tests** | 10 LiteSVM integration tests, happy paths + failure paths |
+| **Live app** | [solana-dev-frontend.vercel.app](https://solana-dev-frontend.vercel.app) ("Neon NFT Portal") |
+| **Source** | [`nft-marketplace/`](nft-marketplace/) (program) · [`frontend/`](frontend/) (app) |
+| **Tests** | 21 LiteSVM integration tests — happy paths and 13 failure paths |
 
 Fixed-price listings (list / buy / cancel / update price) and timed English
 auctions (create / bid with automatic outbid refunds / settle / cancel), NFTs
@@ -54,11 +54,26 @@ Runs against **devnet**. See [`week3-tokens/`](week3-tokens/).
 
 ## Frontend
 
-A shared Next.js app under [`frontend/`](frontend/) wires up the wallet
-adapter and a page per program (Counter, Voting, Token System, and the
-**NFT Marketplace capstone**), all pointed at devnet. Live at
-[solana-dev-frontend.vercel.app](https://solana-dev-frontend.vercel.app) —
-start with `/nft-marketplace`.
+**As of this revision, the frontend is scoped to the NFT marketplace
+capstone only** — the earlier multi-program layout (Counter, Voting, Token
+System pages) has been removed so the deployed app is a single focused
+product rather than a course-exercise showcase. Those programs still exist
+and still build/test independently under their own directories above; only
+their frontend pages were removed.
+
+Live at [solana-dev-frontend.vercel.app](https://solana-dev-frontend.vercel.app)
+("Neon NFT Portal"), a Next.js app under [`frontend/`](frontend/) with:
+
+| Page | What it does |
+|------|--------------|
+| **Marketplace** (`/`) | Browse/buy fixed-price listings and auctions, list your own NFTs, a live mainnet floor-price panel for context |
+| **Portal** (`/portal`) | Your connected wallet's NFT gallery, your active listings/auctions, auctions you're currently winning |
+| **Collections** (`/collections`) | Active listings grouped by their on-chain metadata symbol |
+| **Rewards** (`/rewards`) | A tiered points display computed live from your wallet's real transaction history against the program — no off-chain database, nothing fabricated |
+
+A branded splash screen and the real project logo (`frontend/public/logo.png`,
+`splash-hero.jpg`) replace the generic Next.js defaults, including a proper
+favicon and social-share thumbnail.
 
 ## Toolchain
 

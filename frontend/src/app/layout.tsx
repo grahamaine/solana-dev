@@ -16,6 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://solana-dev-frontend.vercel.app"),
   title: "Neon NFT Portal · Devnet dApp",
   description:
     "Solana devnet NFT marketplace: fixed-price listings, timed auctions, a per-wallet portal, collections, and rewards.",
