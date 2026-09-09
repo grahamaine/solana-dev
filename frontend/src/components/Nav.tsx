@@ -11,7 +11,7 @@ const LINKS = [
   { href: "/counter", label: "Counter" },
   { href: "/voting", label: "Voting" },
   { href: "/token", label: "Token" },
-  { href: "/nft-marketplace", label: "Marketplace" },
+  { href: "/nft-marketplace", label: "Neon Portal" },
 ] as const;
 
 export function Nav() {

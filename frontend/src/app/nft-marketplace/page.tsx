@@ -28,7 +28,7 @@ export default function NftMarketplacePage() {
   return (
     <Container>
       <ProgramHeader
-        title="NFT Marketplace"
+        title="Neon NFT Portal"
         programId={PROGRAM_IDS.nftMarketplace.toBase58()}
         instructions={[
           "initialize_marketplace",

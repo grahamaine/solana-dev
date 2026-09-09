@@ -38,7 +38,7 @@ const PROGRAMS = [
   },
   {
     href: "/nft-marketplace",
-    title: "NFT Marketplace",
+    title: "Neon NFT Portal",
     blurb:
       "Fixed-price listings and timed auctions for existing NFTs, with a marketplace fee.",
     id: PROGRAM_IDS.nftMarketplace.toBase58(),
