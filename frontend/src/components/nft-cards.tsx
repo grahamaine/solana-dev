@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { Card, Button, Badge, Input, AddressLink, MarketplaceIcon } from "@/components/ui";
 import {
   useNftMarketplace,
@@ -61,6 +62,7 @@ export function ListingCard({
   listing: ListingAccount;
   marketplace: ReturnType<typeof useNftMarketplace>;
 }) {
+  const { setVisible } = useWalletModal();
   const isSeller = m.wallet?.publicKey.equals(listing.seller) ?? false;
   const [newPrice, setNewPrice] = useState(lamportsToSol(listing.price).toString());
 
@@ -109,8 +111,11 @@ export function ListingCard({
           </Button>
         </div>
       ) : (
-        <Button loading={m.busy === "buy"} onClick={() => m.buyListing(listing)}>
-          Buy now
+        <Button
+          loading={m.busy === "buy"}
+          onClick={() => (m.wallet ? m.buyListing(listing) : setVisible(true))}
+        >
+          {m.wallet ? "Buy now" : "Connect wallet to buy"}
         </Button>
       )}
     </Card>
@@ -126,6 +131,7 @@ export function AuctionCard({
   auction: AuctionAccount;
   marketplace: ReturnType<typeof useNftMarketplace>;
 }) {
+  const { setVisible } = useWalletModal();
   const [nowTs, setNowTs] = useState(() => Math.floor(Date.now() / 1000));
   useEffect(() => {
     const id = setInterval(() => setNowTs(Math.floor(Date.now() / 1000)), 1000);
@@ -185,10 +191,12 @@ export function AuctionCard({
             />
             <Button
               loading={m.busy === "bid"}
-              disabled={!bid || Number(bid) < currentMin}
-              onClick={() => m.placeBid(auction, solToLamports(Number(bid)))}
+              disabled={m.wallet ? !bid || Number(bid) < currentMin : false}
+              onClick={() =>
+                m.wallet ? m.placeBid(auction, solToLamports(Number(bid))) : setVisible(true)
+              }
             >
-              Place bid
+              {m.wallet ? "Place bid" : "Connect wallet to bid"}
             </Button>
           </div>
         )}

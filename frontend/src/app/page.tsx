@@ -29,9 +29,7 @@ export default function Home() {
       <div className="mb-6">
         <MarketPanel />
       </div>
-      <WalletGate>
-        <MarketplaceApp />
-      </WalletGate>
+      <MarketplaceApp />
     </Container>
   );
 }
@@ -45,7 +43,7 @@ type TypeFilter = (typeof TYPE_FILTERS)[number]["id"];
 
 function MarketplaceApp() {
   const m = useNftMarketplace();
-  const { refresh, refreshOwnedNfts } = m;
+  const { refresh, refreshOwnedNfts, wallet } = m;
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
 
@@ -55,7 +53,7 @@ function MarketplaceApp() {
   }, [refresh, refreshOwnedNfts]);
 
   const isAuthority =
-    m.marketplace && m.wallet?.publicKey.equals(m.marketplace.authority);
+    m.marketplace && wallet?.publicKey.equals(m.marketplace.authority);
 
   const query = search.trim().toLowerCase();
   const matches = (mint: string, seller: string) =>
@@ -72,8 +70,6 @@ function MarketplaceApp() {
 
   return (
     <div className="animate-rise flex flex-col gap-6">
-      {!m.marketplace && !m.loading && <InitializeCard marketplace={m} />}
-
       {/* Global tx feedback */}
       {m.error && (
         <div className="rounded-lg border border-red-500/25 bg-red-500/[.07] px-3 py-2 text-sm text-red-300 break-words">
@@ -97,9 +93,13 @@ function MarketplaceApp() {
         </Card>
       )}
 
-      {m.wallet && <YourNfts nfts={m.ownedNfts} />}
-
-      {m.marketplace && <ListOrAuctionForm marketplace={m} />}
+      {/* Selling and account-specific actions need a connected wallet;
+          browsing listings/auctions below does not. */}
+      <WalletGate>
+        {!m.marketplace && !m.loading && <InitializeCard marketplace={m} />}
+        <YourNfts nfts={m.ownedNfts} />
+        {m.marketplace && <ListOrAuctionForm marketplace={m} />}
+      </WalletGate>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
