@@ -14,6 +14,7 @@ import {
   MarketplaceIcon,
 } from "@/components/ui";
 import { MarketPanel } from "@/components/MarketPanel";
+import { LiveListings } from "@/components/LiveListings";
 import { YourNfts, ListingCard, AuctionCard } from "@/components/nft-cards";
 import { PROGRAM_IDS } from "@/lib/constants";
 import { useNftMarketplace, solToLamports, lamportsToSol, type OwnedNft } from "@/components/useNftMarketplace";
@@ -28,6 +29,9 @@ export default function Home() {
       />
       <div className="mb-6">
         <MarketPanel />
+      </div>
+      <div className="mb-6">
+        <LiveListings />
       </div>
       <MarketplaceApp />
     </Container>

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { COLLECTIONS } from "@/lib/collections";
 
 /**
  * Server-side proxy for Magic Eden's public collection-stats API.
@@ -14,21 +15,6 @@ import { NextResponse } from "next/server";
  * This panel exists purely as a "live market" reference alongside the
  * devnet listings/auctions above it.
  */
-
-const COLLECTIONS = [
-  { symbol: "okay_bears", name: "Okay Bears" },
-  { symbol: "degods", name: "DeGods" },
-  { symbol: "solana_monkey_business", name: "SMB" },
-  { symbol: "y00ts", name: "y00ts" },
-  { symbol: "mad_lads", name: "Mad Lads" },
-  { symbol: "claynosaurz", name: "Claynosaurz" },
-  { symbol: "famous_fox_federation", name: "Famous Fox Federation" },
-  { symbol: "the_heist_by_dreadfulz", name: "The Heist" },
-  { symbol: "retardio_cousins", name: "Retardio Cousins" },
-  { symbol: "galactic_geckos", name: "Galactic Geckos" },
-  { symbol: "taiyo_robotics", name: "Taiyo Robotics" },
-  { symbol: "smyths", name: "Smyths" },
-] as const;
 
 export type MarketCollection = {
   symbol: string;
