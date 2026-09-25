@@ -3,6 +3,13 @@
 Solana development workspace — Encode Solana Developer Course. Built with
 Anchor, tested against LiteSVM (no validator needed: `cargo test`).
 
+## 🎓 Certificate of Completion
+
+Completed the **Solana Developer Bootcamp**, delivered by Encode Club in
+partnership with the Solana Foundation (3 August – 13 September 2026).
+
+![Solana Developer Bootcamp: Certificate of Completion](docs/certificates/solana-developer-bootcamp.jpg)
+
 ## 🏁 Capstone: NFT Marketplace
 
 **This is the course capstone submission** (Week 6, Project Option 2 — "List
