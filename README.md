@@ -59,6 +59,30 @@ Runs against **devnet**. See [`week3-tokens/`](week3-tokens/).
 | [`exercise3-spl-token/`](week3-tokens/exercise3-spl-token/) | **Your First Token**: SPL mint, token accounts, mint supply, transfer between two wallets, then a TS reader (`supply == sender + recipient`) |
 | [`exercise4-token2022/`](week3-tokens/exercise4-token2022/) | **Token-2022 extensions**: mint with **TransferFeeConfig** (observable 5% fee) + **Metadata**, then decode extension data straight off the mint account in TS |
 
+### Week 4 exercises
+
+State machines, cross-program invocation, and a wallet-connected frontend.
+
+| Exercise | Covers |
+|----------|--------|
+| `voting/` (Exercise 5) | **Proposal state machine**: Draft → Active → Closed with creator-only authority — see Week 2 table above, same program |
+| [`tip-jar/`](tip-jar/) (Exercise 6) | **CPI to the System Program**: `invoke` for deposit (owner signs), `invoke_signed` for withdraw (the program signs for a data-less vault PDA using its seeds) — see its [README](tip-jar/README.md) |
+| Exercise 7 (frontend integration) | Existed as counter/voting pages wired into `frontend/`; later removed when the frontend was scoped down to the NFT-marketplace capstone only (see **Frontend** below) |
+
+### Week 5 exercises
+
+One heavy Anchor program plus two lighter integrations — the last exercises
+before the capstone above (built afterwards, out of the course's original
+order, since the capstone had already drawn on their concepts, and chained
+to real state from earlier weeks rather than only ever touching throwaway
+test fixtures).
+
+| Exercise | Covers |
+|----------|--------|
+| [`escrow/`](escrow/) | **Trustless SPL token exchange**: `make`/`take`/`cancel`, a vault owned by the escrow PDA, 11 LiteSVM tests, plus a [devnet demo](escrow/scripts/devnet-demo.ts) that swaps Exercise 3's real SPL token — see its [README](escrow/README.md) for a real BPF stack-overflow bug hit and fixed along the way |
+| [`defi/`](defi/) | **Oracle vs. execution price**: CLI reads Pyth's on-chain devnet price feed and a Jupiter mainnet swap quote, computes the spread — see its [README](defi/README.md) for why the devnet Pyth feed needed a documented Hermes fallback |
+| [`nft-collection/`](nft-collection/) | **Collection NFTs with Umi**: mint a sized collection + 3 verified members with `@metaplex-foundation/mpl-token-metadata`, metadata hosted on Arweave via Irys — see its [README](nft-collection/README.md) for four SDK/RPC quirks hit and worked around on devnet |
+
 ## Frontend
 
 **As of this revision, the frontend is scoped to the NFT marketplace
