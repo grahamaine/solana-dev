@@ -1,0 +1,19 @@
+[toolchain]
+package_manager = "yarn"
+
+[features]
+resolution = true
+skip-lint = false
+
+[programs.localnet]
+escrow = "DSFpAaa8oEwH5byS9228B4VLqpervzGpkWBWeXEwyCGh"
+
+[programs.devnet]
+escrow = "DSFpAaa8oEwH5byS9228B4VLqpervzGpkWBWeXEwyCGh"
+
+[provider]
+cluster = "devnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "cargo test"

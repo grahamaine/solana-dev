@@ -1,0 +1,18 @@
+{
+  "name": "defi",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Week 5 exercise 9 — CLI that reads a Pyth oracle price and a Jupiter swap quote, then computes the spread between them",
+  "scripts": {
+    "spread": "ts-node src/spread.ts"
+  },
+  "dependencies": {
+    "@pythnetwork/client": "^2.22.1",
+    "@solana/web3.js": "^1.98.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3",
+    "@types/node": "^22.9.0"
+  }
+}
